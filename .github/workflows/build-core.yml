@@ -1,14 +1,21 @@
-name: Build core (test)
+name: Build core
 
-# Builds the Groovy core with Quartus 17.0.2 Lite and attaches the .rbf to the
-# workflow run as a downloadable artifact. Nothing is published as a release.
+# Builds the Groovy core with Quartus 17.0.2 Lite.
+# - Pushes to main publish the core as the "latest" release.
+# - Pushes to any other branch only attach it to the workflow run, for testing.
 
 on:
   push:
-    branches-ignore:
-      - main
-      - master
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -28,13 +35,17 @@ jobs:
       - name: Name the build
         run: |
           date=$(date -u +%Y%m%d)
-          sha=$(git rev-parse --short HEAD)
-          cp output_files/Groovy.rbf "Groovy_${date}_test_${sha}.rbf"
-          echo "RBF=Groovy_${date}_test_${sha}.rbf" >> "$GITHUB_ENV"
+          if [ "$GITHUB_REF" = "refs/heads/main" ]; then
+            name="Groovy_${date}.rbf"
+          else
+            name="Groovy_${date}_test_$(git rev-parse --short HEAD).rbf"
+          fi
+          cp output_files/Groovy.rbf "$name"
+          echo "RBF=$name" >> "$GITHUB_ENV"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Groovy-core-test
+          name: Groovy-core
           path: ${{ env.RBF }}
 
       - uses: actions/upload-artifact@v4
@@ -45,3 +56,12 @@ jobs:
             output_files/*.rpt
             output_files/*.summary
           if-no-files-found: ignore
+
+      - name: Publish the latest release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes="Built from ${GITHUB_SHA::7}. Copy ${RBF} to /media/fat/_Utility on the MiSTer."
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest "$RBF" --title "Groovy core (latest build)" --notes "$notes" --target "$GITHUB_SHA"

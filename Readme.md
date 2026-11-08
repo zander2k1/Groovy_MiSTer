@@ -1,5 +1,20 @@
 # Groovy core for MiSTer
 
+## About this fork
+This is psakhis's Groovy core with the MiSTer framework brought up to date. The Groovy logic itself is unchanged. The parts shared by all MiSTer cores were updated, so the core keeps up with current MiSTer releases.
+
+**Download:** [Groovy core (latest build)](https://github.com/zander2k01/Groovy_MiSTer/releases/tag/latest). Copy the `.rbf` file to `/media/fat/_Utility` on your MiSTer.
+
+Changes compared to psakhis's last release (2024-09-28):
+- MiSTer framework (`sys` folder) updated to the November 2026 version of Template_MiSTer. psakhis's PWM output for analog video is kept.
+- New option in the core's menu: **HDMI deinterlace** (Weave or Bob). Bob gives a cleaner picture for 480i over HDMI, for example on a capture card. It does not affect the analog output to a CRT.
+- Added `jtframe_hsize`, which the CRT scale option needs but which was missing from the repository, so the core can be built from source again.
+- The core is built automatically by GitHub Actions with Quartus 17.0.2 Lite.
+
+Works with the updated [Main_MiSTer_Groovy](https://github.com/zander2k01/Main_MiSTer_Groovy), [Groovy Dolphin](https://github.com/zander2k01/groovy-dolphin) and [Groovy OpenMW](https://github.com/zander2k01/groovy-openmw).
+
+All credit for the Groovy core goes to psakhis. The original project is at [psakhis/Groovy_MiSTer](https://github.com/psakhis/Groovy_MiSTer).
+
 ## General description
 This core is a analog GPU for CRTs aiming for very low subframe latency
 
