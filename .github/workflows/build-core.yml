@@ -1,0 +1,47 @@
+name: Build core (test)
+
+# Builds the Groovy core with Quartus 17.0.2 Lite and attaches the .rbf to the
+# workflow run as a downloadable artifact. Nothing is published as a release.
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile with Quartus 17.0.2 Lite
+        run: |
+          chmod -R a+rwX .
+          docker run --rm -v "$PWD":/project -w /project \
+            theypsilon/quartus-lite-c5:17.0.2 \
+            quartus_sh --flow compile Groovy
+          ls -l output_files
+
+      - name: Name the build
+        run: |
+          date=$(date -u +%Y%m%d)
+          sha=$(git rev-parse --short HEAD)
+          cp output_files/Groovy.rbf "Groovy_${date}_test_${sha}.rbf"
+          echo "RBF=Groovy_${date}_test_${sha}.rbf" >> "$GITHUB_ENV"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Groovy-core-test
+          path: ${{ env.RBF }}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: quartus-reports
+          path: |
+            output_files/*.rpt
+            output_files/*.summary
+          if-no-files-found: ignore
