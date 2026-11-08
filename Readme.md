@@ -5,6 +5,8 @@ This is psakhis's Groovy core with the MiSTer framework brought up to date. The 
 
 **Download:** [Groovy core (latest build)](https://github.com/zander2k1/Groovy_MiSTer/releases/tag/latest). Copy the `.rbf` file to `/media/fat/_Utility` on your MiSTer.
 
+**Two parts:** the Groovy setup on a MiSTer has two pieces. This repo is the FPGA core (`Groovy_*.rbf`), which outputs the picture and sound to the CRT. It also needs the Groovy version of the MiSTer main program (`MiSTer_groovy`), which handles the network, from [Main_MiSTer_Groovy](https://github.com/zander2k1/Main_MiSTer_Groovy). You need both.
+
 Changes compared to psakhis's last release (2024-09-28):
 - MiSTer framework (`sys` folder) updated to the November 2026 version of Template_MiSTer. psakhis's PWM output for analog video is kept.
 - New option in the core's menu: **HDMI deinterlace** (Weave or Bob). Bob gives a cleaner picture for 480i over HDMI, for example on a capture card. It does not affect the analog output to a CRT.
